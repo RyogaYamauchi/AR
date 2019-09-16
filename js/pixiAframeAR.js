@@ -5,9 +5,9 @@ window.onload = function () {
 	if(!camera){ camera = document.querySelector("a-marker-camera"); }
 	camera = camera.components.camera.camera;
 
-	//‰æ–Ê‚Ì‰ñ“]ƒtƒ‰ƒO
+	//ã‚«ãƒ¡ãƒ©ã®å›è»¢ãƒ•ãƒ©ã‚°
 	var orientationchanged = false;
-	//ƒ}[ƒJ[‚É‘Î‚µ‚Ä‚Ì’¼—§ƒtƒ‰ƒO
+	//ãƒãƒ¼ã‚«ãƒ¼ã«å¯¾ã—ã¦ã®ç›´ç«‹ãƒ•ãƒ©ã‚°
 	var stand_mode = false;
 
 	var models = [];
@@ -15,40 +15,40 @@ window.onload = function () {
 	loadAssets().then(addModel).then(addPlane);
 
 	function loadAssets() {
-		//ƒ‚[ƒVƒ‡ƒ“‚Ìİ’è
+		//ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ã®è¨­å®š
 		function setMotion(model, resources, x, y, resolve, reject){
 			if (model == null){ reject(); }
 
-			//Šî–{ƒ‚[ƒVƒ‡ƒ“
+			//åŸºæœ¬ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³
 			var motions = [];
 			var animation = LIVE2DCUBISMFRAMEWORK.Animation;
 			var override = LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE;
 			motions.push(animation.fromMotion3Json(resources['motion2'].data));
-			motions.push(animation.fromMotion3Json(resources['motion3'].data));
+			/*motions.push(animation.fromMotion3Json(resources['motion3'].data));
 			motions.push(animation.fromMotion3Json(resources['motion4'].data));
 			motions.push(animation.fromMotion3Json(resources['motion5'].data));
 			motions.push(animation.fromMotion3Json(resources['motion6'].data));
 			motions.push(animation.fromMotion3Json(resources['motion7'].data));
 			motions.push(animation.fromMotion3Json(resources['motion8'].data));
-			motions.push(animation.fromMotion3Json(resources['motion9'].data));
+			motions.push(animation.fromMotion3Json(resources['motion9'].data));*/
 			model.motions = motions;
 			model.animator.addLayer("motion", override, 1);
-			//ƒ‰ƒ“ƒ_ƒ€‚Åƒ‚[ƒVƒ‡ƒ“Ä¶
+			//ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Åƒï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½
 			var rand = Math.floor(Math.random() * model.motions.length);
 			model.animator.getLayer("motion").play(model.motions[rand]);
 
-			//ƒNƒŠƒbƒNƒ‚[ƒVƒ‡ƒ“
+			//ï¿½Nï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½
 			var data = resources['motion1'].data;
 			model.click_motion = animation.fromMotion3Json(data);
 
-			//‹ü’Ç]ƒ‚[ƒVƒ‡ƒ“
+			//ï¿½ï¿½ï¿½ï¿½ï¿½Ç]ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½
 			data.CurveCount = data.TotalPointCount = data.TotalSegmentCount = 0;
 			data.Curves = [];
 			var gaze_motion = animation.fromMotion3Json(data);
 			model.animator.addLayer("gaze", override, 1);
 			model.animator.getLayer("gaze").play(gaze_motion);
 
-			//‹ü’Ç]ƒ‚[ƒVƒ‡ƒ“‚Ìƒpƒ‰ƒ[ƒ^’lXV
+			//ï¿½ï¿½ï¿½ï¿½ï¿½Ç]ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ìƒpï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½lï¿½Xï¿½V
 			model.gaze = new THREE.Vector3();
 			var ids = model.parameters.ids;
 			var angle_x = Math.max(ids.indexOf("ParamAngleX"), ids.indexOf("PARAM_ANGLE_X"));
@@ -70,33 +70,34 @@ window.onload = function () {
 				values[eye_y] = blend(values[eye_y], model.gaze.y * eye_v, 0, weight);
 			}
 
-			//ƒLƒƒƒ“ƒoƒX“à‚Ìƒ‚ƒfƒ‹‚ÌˆÊ’u
+			//ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½oï¿½Xï¿½ï¿½Ìƒï¿½ï¿½fï¿½ï¿½ï¿½ÌˆÊ’u
 			model.pos_x = x;
 			model.pos_y = y;
 
 			models.push(model);
 			resolve();
 		}
-		//ƒAƒZƒbƒg‚Ì“Ç‚İ‚İ
+		//ã‚¢ã‚»ãƒƒãƒˆã®èª­ã¿è¾¼ã¿
 		var xhrType = { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON };
 		var p1 = new Promise(function (resolve, reject) {
 			var loader = new PIXI.loaders.Loader();
 			loader.add('model3', "assets/Koharu/Koharu.model3.json", xhrType);
 			loader.add('motion1', "assets/Koharu/Koharu_01.motion3.json", xhrType);
 			loader.add('motion2', "assets/Koharu/Koharu_02.motion3.json", xhrType);
-			loader.add('motion3', "assets/Koharu/Koharu_03.motion3.json", xhrType);
+			/*loader.add('motion3', "assets/Koharu/Koharu_03.motion3.json", xhrType);
 			loader.add('motion4', "assets/Koharu/Koharu_04.motion3.json", xhrType);
 			loader.add('motion5', "assets/Koharu/Koharu_05.motion3.json", xhrType);
 			loader.add('motion6', "assets/Koharu/Koharu_06.motion3.json", xhrType);
 			loader.add('motion7', "assets/Koharu/Koharu_07.motion3.json", xhrType);
 			loader.add('motion8', "assets/Koharu/Koharu_08.motion3.json", xhrType);
-			loader.add('motion9', "assets/Koharu/Koharu_09.motion3.json", xhrType);
+			loader.add('motion9', "assets/Koharu/Koharu_09.motion3.json", xhrType);*/
 			loader.load(function (loader, resources) {
 				var builder = new LIVE2DCUBISMPIXI.ModelBuilder();
 				builder.buildFromModel3Json(loader, resources['model3'], complate);
 				function complate(model){ setMotion(model, resources, 0.3, 0.5, resolve, reject); }
 			});
 		});
+		/*
 		var p2 = new Promise(function (resolve, reject) {
 			var loader = new PIXI.loaders.Loader();
 			loader.add('model3', "assets/Haruto/Haruto.model3.json", xhrType);
@@ -114,11 +115,11 @@ window.onload = function () {
 				builder.buildFromModel3Json(loader, resources['model3'], complate);
 				function complate(model){ setMotion(model, resources, 0.7, 0.5, resolve, reject); }
 			});
-		});
-		return Promise.all([p1, p2]);
+		});*/
+		return Promise.all([p1/*, p2*/]);
 	}
 	function addModel() {
-		//ƒ‚ƒfƒ‹‚Ì“o˜^
+		//ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ì“oï¿½^
 		var p = new Promise(function (resolve, reject) {
 			models.forEach(function(model){
 				app.stage.addChild(model);
@@ -141,7 +142,7 @@ window.onload = function () {
 		plane.setAttribute('color', '#000');
 		plane.setAttribute('height', '5');
 		plane.setAttribute('width', '5');
-		//ƒ}[ƒJ[‚ğŠî€‚É‚µ‚½ƒ‚ƒfƒ‹‚Ì‘Š‘ÎˆÊ’u
+		//ï¿½}ï¿½[ï¿½Jï¿½[ï¿½ï¿½î€ï¿½É‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ì‘ï¿½ï¿½ÎˆÊ’u
 		plane.setAttribute('position', '0 0 0');
 		var stand = stand_mode ? '0 0 0' : '-90 0 0';
 		plane.setAttribute('rotation', stand);
@@ -182,7 +183,7 @@ window.onload = function () {
 			},
 			tick: function (time, timeDelta) {
 				if(marker.object3D.visible){
-					//‰æ–Ê‚ª‰ñ“]‚µ‚½’¼Œãiƒ‚ƒfƒ‹‚Ì•\¦ˆÊ’u‚ª‚¸‚ê‚Ä‚¢‚éj‚Å‚È‚¢‚È‚ç•`‰æ‚·‚é
+					//ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ì•\ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½jï¿½Å‚È‚ï¿½ï¿½È‚ï¿½`ï¿½æ‚·ï¿½ï¿½
 					if(!orientationchanged){ app.stage.renderable = true; }
 					mesh.material.map.needsUpdate = true;
 
@@ -190,10 +191,10 @@ window.onload = function () {
 					var gaze = plane.object3D.front.getWorldPosition();
 					gaze.sub(pos);
 					models.forEach(function(model){ 
-						//‹ü’Ç]ƒ‚[ƒVƒ‡ƒ“‚ÌXV
+						//ï¿½ï¿½ï¿½ï¿½ï¿½Ç]ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ÌXï¿½V
 						model.gaze = gaze;
 
-						//ƒ‰ƒ“ƒ_ƒ€‚Åƒ‚[ƒVƒ‡ƒ“Ä¶
+						//ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Åƒï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½
 						var motion = model.animator.getLayer("motion");
 						if(motion && motion.currentTime >= motion.currentAnimation.duration){
 							var rand = Math.floor(Math.random() * model.motions.length);
@@ -202,10 +203,10 @@ window.onload = function () {
 						}
 					});
 				}else{
-					//ƒ}[ƒJ[‚ªŠO‚ê‚½‚ç•`‰æ‚ğ~‚ß‚é
+					//ï¿½}ï¿½[ï¿½Jï¿½[ï¿½ï¿½ï¿½Oï¿½ê‚½ï¿½ï¿½`ï¿½ï¿½ï¿½~ï¿½ß‚ï¿½
 					app.stage.renderable = false;
-					//ƒ}[ƒJ[‚ªŠO‚ê‚½‚ç‰æ–Ê‚Ì‰ñ“]ƒtƒ‰ƒO‚ğÜ‚é
-					//¨ƒ}[ƒJ[‚ÌÄŒŸo‚Éƒ‚ƒfƒ‹‚Ì•\¦ˆÊ’u‚ªC³‚³‚ê‚é‚½‚ß
+					//ï¿½}ï¿½[ï¿½Jï¿½[ï¿½ï¿½ï¿½Oï¿½ê‚½ï¿½ï¿½ï¿½Ê‚Ì‰ï¿½]ï¿½tï¿½ï¿½ï¿½Oï¿½ï¿½Ü‚ï¿½
+					//ï¿½ï¿½ï¿½}ï¿½[ï¿½Jï¿½[ï¿½ÌÄŒï¿½ï¿½oï¿½ï¿½ï¿½Éƒï¿½ï¿½fï¿½ï¿½ï¿½Ì•\ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ï¿½
 					orientationchanged = false;
 				}
 			}
@@ -213,7 +214,7 @@ window.onload = function () {
 	}
 
 	var click_event = function (e) {
-		//ƒNƒŠƒbƒNƒ‚[ƒVƒ‡ƒ“‚ÌÄ¶
+		//ï¿½Nï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ÌÄï¿½
 		models.forEach(function(model){ 
 			var motion = model.animator.getLayer("motion");
 			if(motion && model.click_motion){
@@ -222,7 +223,7 @@ window.onload = function () {
 			}
 		});
 	}
-	//PC‚ÆƒXƒ}ƒz‚Ì‘I‘ğƒCƒxƒ“ƒg‚ÌU‚è•ª‚¯
+	//PCï¿½ÆƒXï¿½}ï¿½zï¿½Ì‘Iï¿½ï¿½Cï¿½xï¿½ï¿½ï¿½gï¿½ÌUï¿½è•ªï¿½ï¿½
 	if(window.ontouchstart === undefined){
 		window.onclick = click_event;
 	}else{
@@ -230,14 +231,14 @@ window.onload = function () {
 	}
 	window.onorientationchange = function (e) {
 		if (e === void 0) { e = null; }
-		//‰æ–Ê‚ª‰ñ“]‚·‚é‚Æƒ‚ƒfƒ‹‚Ì•\¦ˆÊ’u‚ª‚¸‚ê‚é‚½‚ß•`‰æ‚ğ~‚ß‚é
+		//ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½Æƒï¿½ï¿½fï¿½ï¿½ï¿½Ì•\ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ß•`ï¿½ï¿½ï¿½~ï¿½ß‚ï¿½
 		app.stage.renderable = false;
-		//‰æ–Ê‚Ì‰ñ“]ƒtƒ‰ƒO‚ğ—§‚Ä‚é
+		//ï¿½ï¿½Ê‚Ì‰ï¿½]ï¿½tï¿½ï¿½ï¿½Oï¿½ğ—§‚Ä‚ï¿½
 		orientationchanged = true;
 	}
 };
 /*
-//FPS‚Ì•\¦
+//FPSï¿½Ì•\ï¿½ï¿½
 var script = document.createElement('script');
 script.onload=function(){
 	var stats = new Stats();
